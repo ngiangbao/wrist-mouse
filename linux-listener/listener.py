@@ -30,13 +30,27 @@ import argparse
 import json
 import logging
 import os
-import socket
 import socketserver
 import subprocess
 import threading
 import time
+from pathlib import Path
 
 log = logging.getLogger("wrist-mouse")
+
+STATUS_PATH = Path(os.environ.get("WRIST_MOUSE_STATUS_PATH", Path.home() / ".cache" / "wrist-mouse" / "status.json"))
+
+
+def write_status(connected: bool, peer: str | None = None) -> None:
+    """Small status file a waybar (or any) script can poll. Best-effort."""
+    try:
+        STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"connected": connected, "peer": peer, "updated": time.time()}
+        tmp = STATUS_PATH.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload))
+        tmp.replace(STATUS_PATH)
+    except OSError as e:
+        log.debug("could not write status file: %s", e)
 
 # ydotool click codes: low byte = button index, high nibble = DOWN(0x40)/UP(0x80)
 BUTTON_INDEX = {"left": 0x00, "right": 0x01, "middle": 0x02}
@@ -121,6 +135,7 @@ class Handler(socketserver.StreamRequestHandler):
                         authed = True
                         self.wfile.write(b'{"ok":true}\n')
                         log.info("%s authenticated", peer)
+                        write_status(True, peer)
                     else:
                         log.warning("%s failed auth, dropping", peer)
                         self.wfile.write(b'{"ok":false}\n')
@@ -143,6 +158,8 @@ class Handler(socketserver.StreamRequestHandler):
         except (ConnectionResetError, BrokenPipeError):
             pass
         finally:
+            if authed:
+                write_status(False, peer)
             log.info("connection from %s closed (last activity %.1fs ago)", peer, time.time() - last_seen)
 
 
@@ -178,11 +195,14 @@ def main() -> None:
     server.backend = backend  # type: ignore[attr-defined]
     server.token = args.token  # type: ignore[attr-defined]
 
-    log.info("wrist-mouse listening on %s:%d", args.host, args.port)
+    write_status(False)
+    log.info("wrist-mouse listening on %s:%d (status file: %s)", args.host, args.port, STATUS_PATH)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
+    finally:
+        write_status(False)
 
 
 if __name__ == "__main__":

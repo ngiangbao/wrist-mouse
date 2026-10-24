@@ -13,7 +13,10 @@ real Bluetooth HID peripheral — so this goes over WiFi instead.
 
 - [`linux-listener/`](linux-listener) — Python TCP server that runs on
   Omarchy and replays incoming move/click events with `ydotool`. No build
-  step, works today.
+  step, works today. Includes a Waybar status module (`waybar-module.sh`)
+  so the bar shows whether the watch is currently connected.
+- [`assets/`](assets) — the wrist-mouse icon (SVG + PNG at a few sizes),
+  used by the Waybar module.
 - [`watch-app/`](watch-app) — SwiftUI watchOS app: the screen is a drag
   trackpad, tap = click. Needs to be built with Xcode (or let CI do it —
   see below).

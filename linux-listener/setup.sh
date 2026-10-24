@@ -26,6 +26,11 @@ systemctl --user enable --now ydotoold.service 2>/dev/null || {
 
 mkdir -p "$DATA_DIR" "$CONF_DIR" "$UNIT_DIR"
 cp "$SCRIPT_DIR/listener.py" "$DATA_DIR/listener.py"
+cp "$SCRIPT_DIR/waybar-module.sh" "$DATA_DIR/waybar-module.sh"
+chmod +x "$DATA_DIR/waybar-module.sh"
+if [ -d "$SCRIPT_DIR/../assets" ]; then
+  cp "$SCRIPT_DIR"/../assets/icon-*.png "$DATA_DIR/" 2>/dev/null || true
+fi
 
 if [ ! -f "$CONF_DIR/env" ]; then
   TOKEN="$(python3 -c 'import secrets; print(secrets.token_hex(16))')"
@@ -56,3 +61,6 @@ echo "================================================================"
 echo
 echo "Check status with:  systemctl --user status wrist-mouse"
 echo "Watch logs with:    journalctl --user -u wrist-mouse -f"
+echo
+echo "Waybar module script installed at: $DATA_DIR/waybar-module.sh"
+echo "See linux-listener/README.md for the config.jsonc / style.css snippets."

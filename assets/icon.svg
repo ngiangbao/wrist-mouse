@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- wrist-mouse icon: a watch face with a cursor, original flat design -->
+  <g fill="none" stroke="#8fd3c7" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- watch lugs (band attachment) -->
+    <path d="M24 10 L24 4 L40 4 L40 10" />
+    <path d="M24 54 L24 60 L40 60 L40 54" />
+
+    <!-- watch case -->
+    <circle cx="32" cy="32" r="19" fill="#17211f" />
+
+    <!-- tick marks -->
+    <line x1="32" y1="16" x2="32" y2="19" />
+    <line x1="32" y1="45" x2="32" y2="48" />
+    <line x1="16" y1="32" x2="19" y2="32" />
+    <line x1="45" y1="32" x2="48" y2="32" />
+
+    <!-- watch hands, pointing to suggest motion / activity -->
+    <line x1="32" y1="32" x2="32" y2="21" stroke-width="2.6" />
+    <line x1="32" y1="32" x2="40" y2="36" stroke-width="2.6" />
+    <circle cx="32" cy="32" r="1.6" fill="#8fd3c7" stroke="none" />
+  </g>
+
+  <!-- cursor arrow, overlapping the case to signal "controls the pointer" -->
+  <g transform="translate(37,35)">
+    <path d="M0 0 L13 5.2 L7.3 7.6 L10.6 14.4 L8.1 15.6 L4.8 8.8 L0.3 12.6 Z"
+          fill="#f4b942" stroke="#17211f" stroke-width="1.4" stroke-linejoin="round" />
+  </g>
+</svg>

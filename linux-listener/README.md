@@ -48,6 +48,46 @@ Newline-delimited JSON over a single persistent TCP connection:
 | `{"type":"down","button":"..."}` / `{"type":"up","button":"..."}` | for drag gestures |
 | `{"type":"ping"}` | server replies `{"type":"pong"}` |
 
+## Waybar module (status indicator on the bar)
+
+`waybar-module.sh` reads the status file `listener.py` keeps updated and
+prints it in the JSON format Waybar's `custom` module type expects.
+
+Add to `~/.config/waybar/config.jsonc`:
+
+```jsonc
+"custom/wristmouse": {
+  "exec": "~/.local/share/wrist-mouse/waybar-module.sh",
+  "return-type": "json",
+  "interval": 5,
+  "tooltip": true
+},
+```
+
+...and add `"custom/wristmouse"` to one of the `modules-left` /
+`modules-center` / `modules-right` arrays in that same file.
+
+Add to `~/.config/waybar/style.css` for the connected/disconnected states
+(uses the generated icon — see [`../assets`](../assets)):
+
+```css
+#custom-wristmouse {
+  padding: 0 8px;
+  background-image: url("file:///home/YOURUSER/.local/share/wrist-mouse/icon-24.png");
+  background-repeat: no-repeat;
+  background-position: center left 4px;
+  padding-left: 26px;
+}
+#custom-wristmouse.connected   { color: #8fd3c7; }
+#custom-wristmouse.disconnected { color: #6b6b6b; }
+```
+
+`setup.sh` copies `waybar-module.sh` and `../assets/icon-24.png` next to
+`listener.py` in `~/.local/share/wrist-mouse/`, so the paths above work
+out of the box (just swap `YOURUSER` for your username, or use `$HOME` if
+your Waybar build resolves it). Reload Waybar with `killall -SIGUSR2 waybar`
+or your Omarchy keybind for "reload bar" to pick up the config change.
+
 ## Notes
 
 - Works over your home WiFi. For control when you're out and about, put
