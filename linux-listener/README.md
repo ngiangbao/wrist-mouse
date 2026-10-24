@@ -50,6 +50,8 @@ Newline-delimited JSON over a single persistent TCP connection:
 
 ## Waybar module (status indicator on the bar)
 
+<img src="../assets/icon-24.png" width="24" valign="middle" alt="" /> — the icon that ships with the module.
+
 `waybar-module.sh` reads the status file `listener.py` keeps updated and
 prints it in the JSON format Waybar's `custom` module type expects.
 

@@ -1,5 +1,7 @@
 # wrist-mouse
 
+<img src="assets/icon-128.png" width="96" align="right" alt="wrist-mouse icon" />
+
 Apple Watch as a wireless trackpad for Omarchy (Hyprland / Wayland Linux),
 since Apple doesn't let a third-party watchOS app advertise itself as a
 real Bluetooth HID peripheral — so this goes over WiFi instead.
