@@ -1,0 +1,69 @@
+name: Build & upload WristMouse to TestFlight
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "watch-app/**"
+      - ".github/workflows/build-and-upload.yml"
+  workflow_dispatch: {}
+
+jobs:
+  build-upload:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: watch-app
+        run: xcodegen generate
+
+      - name: Install App Store Connect API key
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s' "${{ secrets.ASC_API_KEY_P8 }}" > ~/private_keys/AuthKey_${{ secrets.ASC_API_KEY_ID }}.p8
+
+      - name: Archive
+        working-directory: watch-app
+        run: |
+          xcodebuild archive \
+            -project WristMouse.xcodeproj \
+            -scheme WristMouse \
+            -archivePath build/WristMouse.xcarchive \
+            -destination "generic/platform=watchOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.ASC_API_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.ASC_API_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} \
+            DEVELOPMENT_TEAM=${{ secrets.ASC_TEAM_ID }}
+
+      - name: Write exportOptions.plist
+        working-directory: watch-app
+        run: |
+          cat > exportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>${{ secrets.ASC_TEAM_ID }}</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+          </dict>
+          </plist>
+          PLIST
+
+      - name: Export & upload to TestFlight
+        working-directory: watch-app
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/WristMouse.xcarchive \
+            -exportPath build/export \
+            -exportOptionsPlist exportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.ASC_API_KEY_ID }}.p8 \
+            -authenticationKeyID ${{ secrets.ASC_API_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }}

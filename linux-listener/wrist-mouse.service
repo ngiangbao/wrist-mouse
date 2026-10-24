@@ -1,0 +1,15 @@
+[Unit]
+Description=wrist-mouse listener (Apple Watch -> Omarchy pointer bridge)
+After=network-online.target ydotoold.service
+Wants=network-online.target
+Requires=ydotoold.service
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/wrist-mouse/env
+ExecStart=/usr/bin/env python3 %h/.local/share/wrist-mouse/listener.py --port ${WRIST_MOUSE_PORT:-43117}
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
